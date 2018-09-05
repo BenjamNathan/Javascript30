@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML5 Canvas</title>
+</head>
+<body>
+<canvas id="draw" width="800" height="800"></canvas>
+<script>
+const canvas = document.querySelector('#draw');
+//don't draw directly on the canvas, draw on the context
+const ctx = canvas.getContext('2d');
+//grab the context of the canvas, can be 2d or 3d. 3d is for video games etc
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+//gets canvas to cover the width and height of the page
+ctx.strokeStyle = '#BADA55'; //need to specify colour
+ctx.lineJoin = 'round';
+//end of the line and if a line meets another line, should it be squared off, rounded etc
+//go on mdn to see all the variable
+ctx.lineCap = 'round';
+ctx.lineWidth = 50;
+
+let isDrawing = false;
+//this is so the user doesn't draw when they're not clicking
+//will set it so clicking down allows to draw
+//and clicking back up again will set it back to false
+
+let lastX = 0;
+let lastY = 0;
+//This is going to be set to say where the line was started and stopped at
+//to be able to define the line
+let hue = 0; //This is the start colour
+let direction = true;
+
+function draw(e) {
+if(!isDrawing) return;
+ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+//(colour, saturation, lightness)
+ctx.beginPath();
+ctx.moveTo(lastX, lastY);
+ctx.lineTo(e.offsetX, e.offsetY);
+ctx.stroke();
+[lastX, lastY] = [e.offsetX, e.offsetY];
+hue++;
+if(hue >= 360){
+  hue = 0; //resets the count to stop it incrementing so high
+}
+if(ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
+  direction = !direction;
+}
+if(direction) {
+  ctx.lineWidth++;
+} else {
+ctx.lineWidth--;
+}
+
+}
+
+canvas.addEventListener('mousedown', (e) => {
+  isDrawing = true;
+  [lastX, lastY] = [e.offsetX, e.offsetY];
+});
+//records when user is drawing
+
+canvas.addEventListener('mousemove', draw);
+//records where the mouse is on the page
+canvas.addEventListener('mouseup', () => isDrawing = false);
+//if mouse is no longer held down user won't be able to draw
+canvas.addEventListener('mouseout', () => isDrawing = false);
+//if user leaves the canvas it will also set to false to prevent
+//leaving the page, lifting the mouse and return.
+//The user will keep drawing because a mouse up was never triggered
+canvas.addEventListener('mouseenter', (e) => {
+  if(e.buttons == 1) {
+    isDrawing = true;
+  }
+})
+</script>
+
+<style>
+  html, body {
+    margin:0;
+  }
+</style>
+
+</body>
+</html>
